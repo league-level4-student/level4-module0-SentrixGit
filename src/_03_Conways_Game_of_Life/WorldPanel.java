@@ -19,7 +19,7 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 	private Timer timer;
 	
 	//1. Create a 2D array of Cells. Do not initialize it.
-
+	Cell[][] cells;
 	
 	
 	public WorldPanel(int w, int h, int cpr) {
@@ -29,25 +29,38 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 		this.cellsPerRow = cpr;
 	
 		//2. Calculate the cell size.
-		
+		this.cellSize = h / this.cellsPerRow;
 		//3. Initialize the cell array to the appropriate size.
-		
+		this.cells = new Cell[this.cellsPerRow][this.cellsPerRow];
 		//3. Iterate through the array and initialize each cell.
 		//   Don't forget to consider the cell's dimensions when 
 		//   passing in the location.
-		
+		for (int i = 0; i < this.cells.length; i++) {
+			for (int j = 0; j < (this.cells[0]).length; j++) {
+				this.cells[i][j] = new Cell(j * this.cellSize, i * this.cellSize, this.cellSize); 
+			}
+		} 
 	}
 	
 	public void randomizeCells() {
 		//4. Iterate through each cell and randomly set each
 		//   cell's isAlive memeber to true of false
+		for (int i = 0; i < this.cells.length; i++) {
+		      for (int j = 0; j < (this.cells[0]).length; j++) {
+		        this.cells[i][j].isAlive = (new Random()).nextBoolean(); 
+		      }
+		} 
 		
 		repaint();
 	}
 	
 	public void clearCells() {
 		//5. Iterate through the cells and set them all to dead.
-		
+		for (int i = 0; i < this.cells.length; i++) {
+			for (int j = 0; j < (this.cells[0]).length; j++) {
+				this.cells[i][j].isAlive = (new Random()).nextBoolean(); 
+			}
+		} 
 		repaint();
 	}
 	
@@ -66,9 +79,10 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 	@Override
 	public void paintComponent(Graphics g) {
 		//6. Iterate through the cells and draw them all
-		
-		
-		
+		for (int i = 0; i < this.cells.length; i++) {
+			for (int j = 0; j < (this.cells[0]).length; j++)
+				this.cells[i][j].draw(g); 
+		} 
 		// draws grid
 		g.setColor(Color.BLACK);
 		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
@@ -81,7 +95,17 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 		int[][] livingNeighbors = new int[cellsPerRow][cellsPerRow];
 		
 		//8. check if each cell should live or die
-	
+		int i;
+		
+		for (i = 0; i < this.cellsPerRow; i++) {
+			for (int j = 0; j < this.cellsPerRow; j++)
+				livingNeighbors[i][j] = getLivingNeighbors(i, j); 
+		} 
+	    
+		for (i = 0; i < this.cellsPerRow; i++) {
+			for (int j = 0; j < this.cellsPerRow; j++)
+				this.cells[i][j].liveOrDie(livingNeighbors[i][j]); 
+		}
 		
 		
 		
@@ -93,7 +117,32 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 	//   living neighbors there are of the 
 	//   cell identified by x and y
 	public int getLivingNeighbors(int x, int y){
-		return 0;
+		int livingNeighbors = 0;
+	    if (x != 0 && 
+	      (this.cells[x - 1][y]).isAlive)
+	      livingNeighbors++; 
+	    if (x != this.cellsPerRow - 1 && 
+	      (this.cells[x + 1][y]).isAlive)
+	      livingNeighbors++; 
+	    if (y != 0 && 
+	      (this.cells[x][y - 1]).isAlive)
+	      livingNeighbors++; 
+	    if (y != this.cellsPerRow - 1 && 
+	      (this.cells[x][y + 1]).isAlive)
+	      livingNeighbors++; 
+	    if (x != 0 && y != 0 && 
+	      (this.cells[x - 1][y - 1]).isAlive)
+	      livingNeighbors++; 
+	    if (x != this.cellsPerRow - 1 && y != this.cellsPerRow - 1 && 
+	      (this.cells[x + 1][y + 1]).isAlive)
+	      livingNeighbors++; 
+	    if (x != 0 && y != this.cellsPerRow - 1 && 
+	      (this.cells[x - 1][y + 1]).isAlive)
+	      livingNeighbors++; 
+	    if (x != this.cellsPerRow - 1 && y != 0 && 
+	      (this.cells[x + 1][y - 1]).isAlive)
+	      livingNeighbors++; 
+	    return livingNeighbors;
 	}
 
 	@Override
@@ -118,9 +167,14 @@ public class WorldPanel extends JPanel implements MouseListener, ActionListener 
 		//10. Use e.getX() and e.getY() to determine
 		//    which cell is clicked. Then toggle
 		//    the isAlive variable for that cell.
-		
-		
-		
+		for (int i = 0; i < this.cellsPerRow; i++) {
+			for (int k = 0; k < this.cellsPerRow; k++) {
+				Cell c = this.cells[i][k];
+				if (e.getX() > c.getX() && e.getX() < c.getX() + this.cellSize && e.getY() > c.getY() && e.getY() < c.getY() + this.cellSize) {
+					c.isAlive = !c.isAlive;
+				}
+			}
+		}
 		
 		repaint();
 	}
