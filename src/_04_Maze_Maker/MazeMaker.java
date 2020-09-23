@@ -40,9 +40,9 @@ public class MazeMaker{
 		//B. check for unvisited neighbors using the cell
 		ArrayList<Cell> unvisited = getUnvisitedNeighbors(currentCell);
 		//C. if has unvisited neighbors,
-		if (unvisited.size() > 0) {
+		if (!unvisited.isEmpty()) {
 			//C1. select one at random.
-			Cell neighborCell = unvisited.get(randGen.nextInt(unvisited.size());
+			Cell neighborCell = unvisited.get(randGen.nextInt(unvisited.size()));
 			//C2. push it to the stack
 			uncheckedCells.push(neighborCell);
 			//C3. remove the wall between the two cells
@@ -72,13 +72,50 @@ public class MazeMaker{
 	//   This method will check if c1 and c2 are adjacent.
 	//   If they are, the walls between them are removed.
 	private static void removeWalls(Cell c1, Cell c2) {
-		
+		if (c1.getX() < c2.getX()) {
+			c1.setEastWall(false);
+			c2.setWestWall(false);
+		} else if (c1.getX() > c2.getX()) {
+			c1.setWestWall(false);
+			c2.setEastWall(false);
+		} else if (c1.getY() < c2.getY()) {
+			c1.setSouthWall(false);
+			c2.setNorthWall(false);
+		} else if (c1.getY() > c2.getY()) {
+			c1.setNorthWall(false);
+			c2.setSouthWall(false);
+		}
 	}
 	
 	//8. Complete the getUnvisitedNeighbors method
 	//   Any unvisited neighbor of the passed in cell gets added
 	//   to the ArrayList
 	private static ArrayList<Cell> getUnvisitedNeighbors(Cell c) {
-		return null;
+		ArrayList<Cell> unvisited = new ArrayList<Cell>();
+		if (c.getY() > 0) {
+			if (!maze.cells[c.getX()][c.getY() - 1].hasBeenVisited()) {
+				unvisited.add(maze.cells[c.getX()][c.getY() - 1]);
+			}
+		}
+		
+		if (c.getY() < maze.cells[0].length - 1) {
+			if (!maze.cells[c.getX()][c.getY() + 1].hasBeenVisited()) {
+				unvisited.add(maze.cells[c.getX()][c.getY() + 1]);
+			}
+		}
+		
+		if (c.getX() < maze.cells.length - 1) {
+			if (!maze.cells[c.getX() + 1][c.getY()].hasBeenVisited()) {
+				unvisited.add(maze.cells[c.getX() + 1][c.getY()]);
+			}
+		}
+		
+		if (c.getX() > 0) {
+			if (!maze.cells[c.getX() - 1][c.getY()].hasBeenVisited()) {
+				unvisited.add(maze.cells[c.getX() - 1][c.getY()]);
+			}
+		}
+		
+		return unvisited;
 	}
 }
